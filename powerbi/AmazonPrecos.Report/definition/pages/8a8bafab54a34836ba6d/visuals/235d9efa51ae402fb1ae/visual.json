@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "KPIs básicos · Eletrônicos · fonte: DuckDB (gold)",
+                    "value": "KPIs básicos ",
                     "textStyle": {
                       "fontFamily": "Calibri",
                       "fontSize": "11pt",
@@ -114,6 +114,19 @@
               "expr": {
                 "Literal": {
                   "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "divider": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }

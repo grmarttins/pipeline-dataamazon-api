@@ -34,6 +34,34 @@ Os dados passam por **camadas**, e cada camada tem uma função. Essa organizaç
 
 ---
 
+## Telas
+
+### Power BI
+
+**Visão Geral:** indicadores principais, produtos por faixa de preço e maiores descontos.
+
+![Visão Geral no Power BI](docs/img/visao-geral-pb.png)
+
+**Vitrine:** uma "carta" para cada produto, com foto, preço original riscado, preço com desconto e nota. Dá para filtrar por categoria e data e mudar a ordenação.
+
+![Vitrine de produtos no Power BI](docs/img/vitrine-pb.png)
+
+**Evolução do Produto:** como o preço, o desconto e a nota de um produto mudaram entre as extrações.
+
+![Evolução do produto no Power BI](docs/img/evolucao-produto-pb.png)
+
+### Airflow
+
+A DAG diária executada com sucesso. A tarefa `extrair` roda uma vez para cada categoria (*dynamic task mapping*) e registra quanto tempo a API levou para responder:
+
+![Task extrair no Airflow](docs/img/extrair.png)
+
+A tarefa `carregar` mostra todas as etapas finais: carga no banco, checagens de qualidade, imagens, tabelas gold e vitrine. Cada etapa aparece com duração e status (`[ops]`):
+
+![Task carregar no Airflow](docs/img/carregar.png)
+
+---
+
 ## Tecnologias
 
 | Ferramenta | Para que serve aqui |

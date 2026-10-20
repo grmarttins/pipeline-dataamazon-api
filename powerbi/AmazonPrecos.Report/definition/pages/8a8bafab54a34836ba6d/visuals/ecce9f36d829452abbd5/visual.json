@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "ecce9f36d829452abbd5",
   "position": {
     "x": 30,
     "y": 242,
     "z": 11000,
-    "width": 600,
     "height": 455,
+    "width": 600,
     "tabOrder": 11000
   },
   "visual": {
@@ -352,5 +352,37 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "e150e6e4b8fd31880438",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fato_preco_diario"
+              }
+            },
+            "Property": "faixa_preco"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "4c4fdaadc01957b43fcc",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fato_preco_diario"
+              }
+            },
+            "Property": "Produtos Monitorados"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }
