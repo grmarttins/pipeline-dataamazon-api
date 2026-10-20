@@ -35,10 +35,16 @@ def main():
         with open(arquivo, encoding="utf-8") as f:
             df = pd.DataFrame(json.load(f))
         df = df.drop(columns=["_categoria_nome"], errors="ignore")
+        # o legado gravava a hora da extração em horário local, sem fuso -> converte para UTC
+        df["_extraido_em"] = (
+            pd.to_datetime(df["_data_extracao"]).dt.tz_localize("America/Sao_Paulo").dt.tz_convert("UTC")
+            .map(lambda t: t.isoformat())
+        )
         df["_categoria"] = categoria
         df["_data_extracao"] = data
         df["_arquivo_origem"] = f"_legado/{arquivo.name}"
         df["_ingerido_em"] = None
+        df["_run_id"] = "legado"
 
         salvar_bronze(df, categoria, data)
         shutil.move(arquivo, LEGADO_DIR / arquivo.name)

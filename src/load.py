@@ -4,6 +4,7 @@ import logging
 import duckdb
 
 from src.config import PROJECT_ROOT, SILVER_DIR, WAREHOUSE_PATH, particao
+from src.observabilidade import DDL_EXECUCOES, etapa
 
 logger = logging.getLogger(__name__)
 
@@ -27,18 +28,24 @@ def conectar() -> duckdb.DuckDBPyConnection:
     con = duckdb.connect(str(WAREHOUSE_PATH))
     con.execute("CREATE SCHEMA IF NOT EXISTS silver")
     con.execute("CREATE SCHEMA IF NOT EXISTS gold")
+    con.execute(DDL_EXECUCOES)  # as views de saúde do pipeline dependem dela
     return con
 
 
 def carregar_silver(con: duckdb.DuckDBPyConnection, categoria: str, data: str) -> None:
     """Substitui a partição (categoria, data) no banco — reprocessar não duplica."""
     arquivo = (particao(SILVER_DIR, categoria, data) / "produtos.parquet").as_posix()
+    origem = f"SELECT *, ''::VARCHAR AS categoria_slug, now() AS carregado_em FROM read_parquet('{arquivo}')"
 
-    # na primeira carga, a tabela nasce com o schema do parquet + coluna da partição
-    con.execute(f"""
-        CREATE TABLE IF NOT EXISTS silver.produtos AS
-        SELECT *, ''::VARCHAR AS categoria_slug FROM read_parquet('{arquivo}') LIMIT 0
-    """)
+    # na primeira carga, a tabela nasce com o schema do parquet + colunas de carga
+    con.execute(f"CREATE TABLE IF NOT EXISTS silver.produtos AS {origem} LIMIT 0")
+
+    # evolução de schema: colunas novas na silver viram colunas novas na tabela (nulas no histórico)
+    existentes = {r[0] for r in con.execute("DESCRIBE silver.produtos").fetchall()}
+    for nome, tipo, *_ in con.execute(f"DESCRIBE {origem}").fetchall():
+        if nome not in existentes:
+            con.execute(f'ALTER TABLE silver.produtos ADD COLUMN "{nome}" {tipo}')
+            logger.info("[load] coluna nova em silver.produtos: %s %s", nome, tipo)
 
     con.execute("BEGIN")
     con.execute(
@@ -46,7 +53,8 @@ def carregar_silver(con: duckdb.DuckDBPyConnection, categoria: str, data: str) -
         [categoria, data],
     )
     con.execute(
-        f"INSERT INTO silver.produtos BY NAME SELECT *, ? AS categoria_slug FROM read_parquet('{arquivo}')",
+        f"INSERT INTO silver.produtos BY NAME "
+        f"SELECT * REPLACE (? AS categoria_slug) FROM ({origem})",
         [categoria],
     )
     con.execute("COMMIT")
@@ -74,9 +82,16 @@ def checar_qualidade(con: duckdb.DuckDBPyConnection) -> None:
     logger.info("[qualidade] %d checagens ok", len(CHECAGENS))
 
 
-def carregar(particoes: list[tuple[str, str]]) -> None:
+def carregar(particoes: list[tuple[str, str]], run_id: str) -> None:
     with conectar() as con:
         for categoria, data in particoes:
-            carregar_silver(con, categoria, data)
-        checar_qualidade(con)
-        construir_gold(con)
+            with etapa(run_id, "load", categoria, data) as info:
+                carregar_silver(con, categoria, data)
+                info["registros"] = con.execute(
+                    "SELECT count(*) FROM silver.produtos WHERE categoria_slug = ? AND CAST(data_extracao AS DATE) = ?",
+                    [categoria, data],
+                ).fetchone()[0]
+        with etapa(run_id, "qualidade"):
+            checar_qualidade(con)
+        with etapa(run_id, "gold"):
+            construir_gold(con)

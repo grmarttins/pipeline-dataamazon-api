@@ -16,6 +16,7 @@ from tenacity import (
 )
 
 from src.config import CATEGORIAS, ENV_PATH, RAW_DIR, particao
+from src.observabilidade import agora_utc
 
 logger = logging.getLogger(__name__)
 load_dotenv(ENV_PATH)
@@ -51,7 +52,7 @@ def acessar_chave_api() -> dict:
     retry=retry_if_exception_type((APIRateLimitError, APIResponseError, requests.Timeout)),
     before_sleep=before_sleep_log(logger, logging.WARNING),
 )
-def _fazer_request(params: dict, timeout: int = 20) -> dict:
+def _fazer_request(params: dict, timeout: int = 20) -> tuple[dict, requests.Response]:
     response = requests.get(BASE_URL, headers=acessar_chave_api(), params=params, timeout=timeout)
 
     if response.status_code == 429:
@@ -68,12 +69,13 @@ def _fazer_request(params: dict, timeout: int = 20) -> dict:
         raise APIResponseError(f"Status inesperado: {response.status_code}")
 
     try:
-        return response.json()
+        return response.json(), response
     except json.JSONDecodeError as e:
         raise APIResponseError(f"Resposta não é JSON válido: {e}") from e
 
 
-def extrair_pagina(categoria: str, page: int) -> dict:
+def extrair_pagina(categoria: str, page: int, run_id: str) -> tuple[dict, dict]:
+    """Retorna (resposta crua da API, metadados da requisição)."""
     categoria_id, _ = CATEGORIAS[categoria]
     params = {
         "category_id": categoria_id,
@@ -84,22 +86,38 @@ def extrair_pagina(categoria: str, page: int) -> dict:
         "is_prime": "false",
         "deals_and_discounts": "NONE",
     }
-    return _fazer_request(params)
+    requisitado_em, t0 = agora_utc(), time.perf_counter()
+    resposta, response = _fazer_request(params)
+    meta = {
+        "run_id": run_id,
+        "requisitado_em": requisitado_em.isoformat(),
+        "duracao_ms": round((time.perf_counter() - t0) * 1000),  # inclui esperas de retry
+        "tempo_resposta_ms": round(response.elapsed.total_seconds() * 1000),  # só a última tentativa
+        "tentativas": _fazer_request.statistics.get("attempt_number", 1),
+        "status_http": response.status_code,
+        "resposta_date_header": response.headers.get("Date"),
+        "request_id": resposta.get("request_id"),
+        "parametros": params,
+    }
+    return resposta, meta
 
 
-def salvar_raw(resposta: dict, categoria: str, data: str, page: int) -> Path:
+def salvar_raw(resposta: dict, meta: dict, categoria: str, data: str, page: int) -> Path:
+    """Resposta da API intocada em page_N.json; metadados ao lado, em page_N.meta.json."""
     output = particao(RAW_DIR, categoria, data) / f"page_{page}.json"
     output.parent.mkdir(parents=True, exist_ok=True)
     with open(output, "w", encoding="utf-8") as f:
         json.dump(resposta, f, indent=2, ensure_ascii=False)
+    with open(output.with_suffix(".meta.json"), "w", encoding="utf-8") as f:
+        json.dump(meta, f, indent=2, ensure_ascii=False)
     return output
 
 
-def extrair(categoria: str, data: str, pages: int = 1, delay: float = 3.0) -> list[Path]:
+def extrair(categoria: str, data: str, run_id: str, pages: int = 1, delay: float = 3.0) -> list[Path]:
     arquivos = []
     for page in range(1, pages + 1):
         try:
-            resposta = extrair_pagina(categoria, page)
+            resposta, meta = extrair_pagina(categoria, page, run_id)
         except APIKeyError:
             logger.error("Chave inválida — abortando.")
             raise
@@ -107,9 +125,9 @@ def extrair(categoria: str, data: str, pages: int = 1, delay: float = 3.0) -> li
             logger.error("Falha após retries na página %d: %s", page, e)
             continue
 
-        arquivo = salvar_raw(resposta, categoria, data, page)
+        arquivo = salvar_raw(resposta, meta, categoria, data, page)
         n = len(resposta.get("data", {}).get("products", []))
-        logger.info("[raw] %s página %d | %d produtos -> %s", categoria, page, n, arquivo)
+        logger.info("[raw] %s página %d | %d produtos | %d ms -> %s", categoria, page, n, meta["duracao_ms"], arquivo)
         arquivos.append(arquivo)
         time.sleep(delay)
 

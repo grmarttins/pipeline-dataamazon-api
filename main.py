@@ -1,18 +1,31 @@
 """
 Pipeline: API -> raw -> bronze -> silver -> DuckDB (silver.produtos + gold.*)
+Cada etapa é cronometrada e registrada em ops.execucoes, sob um run_id por execução.
 
     python main.py                 # extrai hoje (todas as categorias) e processa
     python main.py --pages 3       # extrai 3 páginas por categoria
     python main.py --reprocessar   # não chama a API; refaz silver e banco a partir de toda a bronze
 """
 import argparse
+import logging
 from datetime import date
 
 from src.config import BRONZE_DIR, CATEGORIAS, listar_particoes
 from src.extract import extrair
 from src.ingest import ingerir
 from src.load import carregar
+from src.observabilidade import contar_linhas, etapa, novo_run_id
 from src.transform import transformar
+
+logger = logging.getLogger(__name__)
+
+
+def processar(run_id: str, categoria: str, data: str, processadas: list) -> None:
+    with etapa(run_id, "transform", categoria, data) as info:
+        silver = transformar(categoria, data, run_id)
+        info["registros"] = contar_linhas(silver)
+    if silver:
+        processadas.append((categoria, data))
 
 
 def main():
@@ -22,20 +35,27 @@ def main():
     parser.add_argument("--reprocessar", action="store_true")
     args = parser.parse_args()
 
-    processadas = []
-    if args.reprocessar:
-        for categoria, data in listar_particoes(BRONZE_DIR):
-            if transformar(categoria, data):
-                processadas.append((categoria, data))
-    else:
-        hoje = date.today().isoformat()
-        for categoria in CATEGORIAS:
-            if extrair(categoria, hoje, pages=args.pages, delay=args.delay):
-                ingerir(categoria, hoje)
-                if transformar(categoria, hoje):
-                    processadas.append((categoria, hoje))
+    run_id = novo_run_id()
+    logger.info("run_id: %s", run_id)
 
-    carregar(processadas)
+    with etapa(run_id, "pipeline"):
+        processadas = []
+        if args.reprocessar:
+            for categoria, data in listar_particoes(BRONZE_DIR):
+                processar(run_id, categoria, data, processadas)
+        else:
+            hoje = date.today().isoformat()
+            for categoria in CATEGORIAS:
+                with etapa(run_id, "extract", categoria, hoje) as info:
+                    paginas = extrair(categoria, hoje, run_id, pages=args.pages, delay=args.delay)
+                    info["registros"] = len(paginas)
+                if not paginas:
+                    continue
+                with etapa(run_id, "ingest", categoria, hoje) as info:
+                    info["registros"] = contar_linhas(ingerir(categoria, hoje, run_id))
+                processar(run_id, categoria, hoje, processadas)
+
+        carregar(processadas, run_id)
 
 
 if __name__ == "__main__":

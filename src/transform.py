@@ -6,6 +6,7 @@ from pathlib import Path
 import pandas as pd
 
 from src.config import BRONZE_DIR, CATEGORIAS, SILVER_DIR, particao
+from src.observabilidade import agora_utc
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +59,11 @@ SCHEMA_SILVER = {
     "url_produto":            "string",
     "url_imagem":             "string",
     "data_extracao":          "datetime64[us]",
+    # linhagem (UTC): metadados, não entram na chave nem na deduplicação
+    "extraido_em":            "datetime64[us, UTC]",
+    "ingerido_em":            "datetime64[us, UTC]",
+    "processado_em":          "datetime64[us, UTC]",
+    "run_id":                 "string",
 }
 
 
@@ -95,11 +101,11 @@ def parse_entrega_gratis(val) -> bool:
     return "GRÁTIS" in str(val).upper()
 
 
-def transform(df: pd.DataFrame) -> pd.DataFrame:
+def transform(df: pd.DataFrame, run_id: str) -> pd.DataFrame:
     df = df.rename(columns=RENOMEAR)
 
     # garante que colunas opcionais da API existam, mesmo vazias
-    for col in list(RENOMEAR.values()) + ["sales_volume", "delivery", "book_format"]:
+    for col in list(RENOMEAR.values()) + ["sales_volume", "delivery", "book_format", "_extraido_em", "_ingerido_em"]:
         if col not in df.columns:
             df[col] = pd.NA
 
@@ -118,6 +124,10 @@ def transform(df: pd.DataFrame) -> pd.DataFrame:
     df["plataforma"] = df["book_format"].fillna("Geral").astype(str).str.strip()
     df["categoria"] = df["_categoria"].map(lambda c: CATEGORIAS.get(c, (None, c))[1])
     df["data_extracao"] = pd.to_datetime(df["_data_extracao"], errors="coerce")
+    df["extraido_em"] = pd.to_datetime(df["_extraido_em"], errors="coerce", utc=True)
+    df["ingerido_em"] = pd.to_datetime(df["_ingerido_em"], errors="coerce", utc=True)
+    df["processado_em"] = agora_utc()
+    df["run_id"] = run_id
 
     # mesmo produto pode aparecer em mais de uma página: fica a primeira ocorrência
     df = df.dropna(subset=["codigo_produto"]).drop_duplicates(subset=["codigo_produto"])
@@ -125,13 +135,13 @@ def transform(df: pd.DataFrame) -> pd.DataFrame:
     return df[list(SCHEMA_SILVER)].astype(SCHEMA_SILVER).reset_index(drop=True)
 
 
-def transformar(categoria: str, data: str) -> Path | None:
+def transformar(categoria: str, data: str, run_id: str) -> Path | None:
     origem = particao(BRONZE_DIR, categoria, data) / "produtos.parquet"
     if not origem.exists():
         logger.warning("[silver] bronze inexistente: %s", origem)
         return None
 
-    df = transform(pd.read_parquet(origem))
+    df = transform(pd.read_parquet(origem), run_id)
     output = particao(SILVER_DIR, categoria, data) / "produtos.parquet"
     output.parent.mkdir(parents=True, exist_ok=True)
     df.to_parquet(output, index=False, engine="pyarrow")
