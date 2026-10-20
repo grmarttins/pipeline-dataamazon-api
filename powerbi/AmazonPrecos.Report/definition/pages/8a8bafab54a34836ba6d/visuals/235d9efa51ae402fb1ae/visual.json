@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "235d9efa51ae402fb1ae",
   "position": {
-    "x": 34,
-    "y": 58,
+    "x": 34.114713216957604,
+    "y": 58.354114713216958,
     "z": 2000,
-    "width": 650,
-    "height": 24,
+    "height": 29.625935162094763,
+    "width": 649.97506234413959,
     "tabOrder": 2000
   },
   "visual": {
@@ -21,9 +21,9 @@
                   {
                     "value": "KPIs básicos · Eletrônicos · fonte: DuckDB (gold)",
                     "textStyle": {
-                      "color": "#BBC3D1",
+                      "fontFamily": "Calibri",
                       "fontSize": "11pt",
-                      "fontFamily": "Calibri"
+                      "color": "#bbc3d1"
                     }
                   }
                 ]

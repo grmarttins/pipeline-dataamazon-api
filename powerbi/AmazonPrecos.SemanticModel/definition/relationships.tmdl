@@ -13,3 +13,12 @@ relationship 0d65061c-fdb9-44fe-9b0f-5716c0a984bd
 relationship 52c6dfef-cfa7-4d48-89b1-f700baeacb4e
 	fromColumn: top_descontos.codigo_produto
 	toColumn: dim_produto.codigo_produto
+
+relationship 2013028c-a3ac-460b-805e-96a46780af7c
+	fromColumn: vitrine_cards.data
+	toColumn: dim_data.data
+
+relationship 55926bce-75e6-4777-96a4-c2cd8099ee9c
+	fromColumn: vitrine_cards.codigo_produto
+	toColumn: dim_produto.codigo_produto
+

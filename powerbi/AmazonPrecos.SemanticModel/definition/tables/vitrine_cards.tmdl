@@ -1,0 +1,103 @@
+table vitrine_cards
+	lineageTag: ef0b0f4e-016a-4b28-ae94-bae08dadf871
+
+	/// Várias datas no filtro (ou nenhuma): mostra a carta da extração mais recente entre elas
+	measure 'Card Produto' = VAR UltimaData = CALCULATE(MAX(vitrine_cards[data]), ALLSELECTED(vitrine_cards)) RETURN CALCULATE(SELECTEDVALUE(vitrine_cards[card_svg]), vitrine_cards[data] = UltimaData)
+		lineageTag: 914b3957-a480-4bf5-8a73-cd7ec2b55243
+		dataCategory: ImageUrl
+
+	column ordenacao
+		dataType: string
+		lineageTag: 0b6f1d2a-6a3c-4e8e-9d51-7f1c2a9e4b10
+		summarizeBy: none
+		sourceColumn: ordenacao
+		sortByColumn: ordem_ordenacao
+
+		annotation SummarizationSetBy = Automatic
+
+	column ordem_ordenacao
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 5d2e8c41-93b7-4f0a-a6c2-1e4b7d9f3a22
+		summarizeBy: none
+		sourceColumn: ordem_ordenacao
+
+		annotation SummarizationSetBy = Automatic
+
+	column codigo_produto
+		dataType: string
+		lineageTag: 1eea2b37-fe48-4cee-8979-8d5e9da43fa8
+		summarizeBy: none
+		sourceColumn: codigo_produto
+
+		annotation SummarizationSetBy = Automatic
+
+	column categoria
+		dataType: string
+		lineageTag: 6f931bbb-9259-4a6d-bb21-30ae83816034
+		summarizeBy: none
+		sourceColumn: categoria
+
+		annotation SummarizationSetBy = Automatic
+
+	column posicao
+		dataType: int64
+		formatString: 0
+		lineageTag: ecb4dc45-b8ac-499a-b88d-49bd3248b99d
+		summarizeBy: none
+		sourceColumn: posicao
+
+		annotation SummarizationSetBy = Automatic
+
+	column linha
+		dataType: int64
+		formatString: 0
+		lineageTag: 8642d3f0-ac68-48ba-af0b-a7284da49d04
+		summarizeBy: none
+		sourceColumn: linha
+
+		annotation SummarizationSetBy = Automatic
+
+	column coluna
+		dataType: int64
+		formatString: 0
+		lineageTag: e1dc181f-b576-4334-967e-bcab969368e1
+		summarizeBy: none
+		sourceColumn: coluna
+
+		annotation SummarizationSetBy = Automatic
+
+	column card_svg
+		dataType: string
+		isHidden
+		lineageTag: 3dd8f8dd-6ed4-452c-96d4-037ff78d302e
+		dataCategory: ImageUrl
+		summarizeBy: none
+		sourceColumn: card_svg
+
+		annotation SummarizationSetBy = Automatic
+
+	column data
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 8e587646-2762-4b9d-8e7a-6457ddf385c3
+		summarizeBy: none
+		sourceColumn: data
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition vitrine_cards = m
+		mode: import
+		source =
+				let
+				    Fonte = Odbc.Query("driver={DuckDB Driver};database=" & CaminhoBanco & ";access_mode=read_only",
+				        "SELECT * FROM gold.vitrine_cards"),
+				    Tipos = Table.TransformColumnTypes(Fonte, {{"data", type date}, {"ordenacao", type text}, {"ordem_ordenacao", Int64.Type}, {"codigo_produto", type text}, {"categoria", type text}, {"posicao", Int64.Type}, {"linha", Int64.Type}, {"coluna", Int64.Type}, {"card_svg", type text}})
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table
+

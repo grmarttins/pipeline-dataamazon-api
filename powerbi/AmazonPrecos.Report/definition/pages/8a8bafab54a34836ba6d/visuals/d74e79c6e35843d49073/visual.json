@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "d74e79c6e35843d49073",
   "position": {
     "x": 646,
     "y": 242,
     "z": 12000,
-    "width": 604,
     "height": 455,
+    "width": 604,
     "tabOrder": 12000
   },
   "visual": {
@@ -98,10 +98,10 @@
                     "Entity": "top_descontos"
                   }
                 },
-                "Property": "posicao"
+                "Property": "preco_original"
               }
             },
-            "direction": "Ascending"
+            "direction": "Descending"
           }
         ]
       }
@@ -140,6 +140,13 @@
               }
             },
             "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "autoSizeColumnWidth": {
               "expr": {
                 "Literal": {
                   "Value": "true"
@@ -197,6 +204,22 @@
                 }
               }
             }
+          }
+        }
+      ],
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "208.7819648759733D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "top_descontos.titulo_produto"
           }
         }
       ]
@@ -374,5 +397,79 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "06cb8c105cbfc35d9e90",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "top_descontos"
+              }
+            },
+            "Property": "posicao"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "3a0ac3a8db7ef66a1a68",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "top_descontos"
+              }
+            },
+            "Property": "titulo_produto"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "52f472263e3d535de029",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "top_descontos"
+              }
+            },
+            "Property": "preco"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "cbd95ec50f0ebfb56f95",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "top_descontos"
+              }
+            },
+            "Property": "preco_original"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "ec0601e440a533b46b8b",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "top_descontos"
+              }
+            },
+            "Property": "desconto_pct"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

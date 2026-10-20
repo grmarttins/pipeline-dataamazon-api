@@ -10,6 +10,8 @@ table dim_data
 
 		annotation SummarizationSetBy = Automatic
 
+		annotation UnderlyingDateTimeDataType = Date
+
 	partition dim_data = m
 		mode: import
 		source =
@@ -21,3 +23,4 @@ table dim_data
 				    Tipos
 
 	annotation PBI_ResultType = Table
+

@@ -5,6 +5,7 @@ import duckdb
 
 from src.config import PROJECT_ROOT, SILVER_DIR, WAREHOUSE_PATH, particao
 from src.observabilidade import DDL_EXECUCOES, etapa
+from src.vitrine import baixar_imagens, gerar_cards
 
 logger = logging.getLogger(__name__)
 
@@ -93,5 +94,9 @@ def carregar(particoes: list[tuple[str, str]], run_id: str) -> None:
                 ).fetchone()[0]
         with etapa(run_id, "qualidade"):
             checar_qualidade(con)
+        with etapa(run_id, "imagens") as info:
+            info["registros"] = baixar_imagens(con)
         with etapa(run_id, "gold"):
             construir_gold(con)
+        with etapa(run_id, "vitrine") as info:
+            info["registros"] = gerar_cards(con)

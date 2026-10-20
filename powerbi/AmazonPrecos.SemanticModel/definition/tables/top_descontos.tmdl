@@ -10,6 +10,8 @@ table top_descontos
 
 		annotation SummarizationSetBy = Automatic
 
+		annotation UnderlyingDateTimeDataType = Date
+
 	column posicao
 		dataType: int64
 		formatString: #,0
@@ -91,3 +93,4 @@ table top_descontos
 				    Resultado
 
 	annotation PBI_ResultType = Table
+

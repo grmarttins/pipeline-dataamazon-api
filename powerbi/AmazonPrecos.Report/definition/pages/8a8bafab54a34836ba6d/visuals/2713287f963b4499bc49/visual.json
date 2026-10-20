@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "2713287f963b4499bc49",
   "position": {
-    "x": 34,
-    "y": 22,
+    "x": 34.114713216957604,
+    "y": 19.75062344139651,
     "z": 1000,
-    "width": 650,
-    "height": 38,
+    "height": 40.399002493765586,
+    "width": 649.97506234413959,
     "tabOrder": 1000
   },
   "visual": {
@@ -21,10 +21,10 @@
                   {
                     "value": "Amazon BR | Monitor de Preços",
                     "textStyle": {
-                      "color": "#FFFFFF",
-                      "fontSize": "22pt",
+                      "fontWeight": "bold",
                       "fontFamily": "Calibri",
-                      "fontWeight": "bold"
+                      "fontSize": "22pt",
+                      "color": "#ffffff"
                     }
                   }
                 ]

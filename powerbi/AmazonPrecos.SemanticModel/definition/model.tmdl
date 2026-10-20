@@ -7,11 +7,17 @@ model Model
 		legacyRedirects
 		returnErrorValuesAsNull
 
-annotation PBI_QueryOrder = ["CaminhoBanco", "dim_data", "dim_produto", "fato_preco_diario", "top_descontos"]
+annotation PBI_QueryOrder = ["CaminhoBanco", "dim_data", "dim_produto", "fato_preco_diario", "top_descontos", "vitrine_cards"]
 
 annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_ProTooling = ["DevMode"]
 
 ref table dim_data
 ref table dim_produto
 ref table fato_preco_diario
 ref table top_descontos
+ref table vitrine_cards
+
+ref cultureInfo pt-BR
+

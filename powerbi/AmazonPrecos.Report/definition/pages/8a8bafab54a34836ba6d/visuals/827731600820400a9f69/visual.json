@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "827731600820400a9f69",
   "position": {
     "x": 1060,
     "y": 110,
     "z": 10000,
-    "width": 190,
     "height": 112,
+    "width": 190,
     "tabOrder": 10000
   },
   "visual": {
@@ -298,5 +298,23 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "e3126c927ef46800a1d1",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fato_preco_diario"
+              }
+            },
+            "Property": "Vendas Estimadas"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

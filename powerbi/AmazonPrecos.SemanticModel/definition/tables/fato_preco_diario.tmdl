@@ -25,6 +25,14 @@ table fato_preco_diario
 		formatString: #,0
 		lineageTag: 0b42c27a-82ba-4443-938d-1e0109d330a0
 
+	measure 'Preço Original Médio' = AVERAGE(fato_preco_diario[preco_original])
+		formatString: \R$ #,0.00
+		lineageTag: c32a30f5-401e-4805-b9b8-d9d697611f6e
+
+	measure 'Qtd Avaliações' = MAX(fato_preco_diario[quantidade_avaliacoes])
+		formatString: #,0
+		lineageTag: e381ff2c-9c91-4f02-ba04-e32c5ad7a73f
+
 	column codigo_produto
 		dataType: string
 		lineageTag: 42c9c297-7342-4b3d-a573-6a8199ee8150
@@ -41,6 +49,8 @@ table fato_preco_diario
 		sourceColumn: data
 
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column categoria
 		dataType: string
@@ -173,11 +183,11 @@ table fato_preco_diario
 
 	column faixa_ordem
 		dataType: int64
+		isHidden
 		formatString: #,0
 		lineageTag: 6224d263-bec9-420a-93e4-dfef9cf85c62
 		summarizeBy: none
 		sourceColumn: faixa_ordem
-		isHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -194,3 +204,4 @@ table fato_preco_diario
 				    Resultado
 
 	annotation PBI_ResultType = Table
+

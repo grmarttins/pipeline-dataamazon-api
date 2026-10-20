@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "2e8485dc5d3d45edb920",
   "position": {
-    "x": 725,
-    "y": 20,
+    "x": 725.38653366583537,
+    "y": 13.466334164588527,
     "z": 3000,
-    "width": 255,
-    "height": 68,
+    "height": 74.51371571072319,
+    "width": 254.96259351620947,
     "tabOrder": 3000
   },
   "visual": {
@@ -87,6 +87,13 @@
               "expr": {
                 "Literal": {
                   "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Categoria '"
                 }
               }
             }
@@ -259,5 +266,23 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "18836bc03c4481f8edb4",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_produto"
+              }
+            },
+            "Property": "categoria"
+          }
+        },
+        "type": "Categorical"
+      }
+    ]
   }
 }

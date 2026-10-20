@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "388cfca149cb4c72b237",
   "position": {
-    "x": 236,
-    "y": 110,
+    "x": 251.3715710723192,
+    "y": 110.42394014962593,
     "z": 6000,
-    "width": 190,
-    "height": 112,
+    "height": 111.3216957605985,
+    "width": 175.06234413965086,
     "tabOrder": 6000
   },
   "visual": {
@@ -298,5 +298,23 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "dfe9290b26081e41954d",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fato_preco_diario"
+              }
+            },
+            "Property": "Preço Médio"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

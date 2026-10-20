@@ -36,18 +36,18 @@ table dim_produto
 	column url_produto
 		dataType: string
 		lineageTag: c29d8d36-f755-4111-91f9-28d6e256255f
+		dataCategory: WebUrl
 		summarizeBy: none
 		sourceColumn: url_produto
-		dataCategory: WebUrl
 
 		annotation SummarizationSetBy = Automatic
 
 	column url_imagem
 		dataType: string
 		lineageTag: 4d53448f-7c88-407c-8e78-2595a70313a8
+		dataCategory: ImageUrl
 		summarizeBy: none
 		sourceColumn: url_imagem
-		dataCategory: ImageUrl
 
 		annotation SummarizationSetBy = Automatic
 
@@ -60,14 +60,34 @@ table dim_produto
 
 		annotation SummarizationSetBy = Automatic
 
+		annotation UnderlyingDateTimeDataType = Date
+
+	column qtd_extracoes
+		dataType: int64
+		formatString: 0
+		lineageTag: 5343f1f0-7808-4789-bfc6-f4ae030fa02e
+		summarizeBy: none
+		sourceColumn: qtd_extracoes
+
+		annotation SummarizationSetBy = Automatic
+
+	column comparacao
+		dataType: string
+		lineageTag: fbc92029-937e-44ad-a126-2d980e43ff84
+		summarizeBy: none
+		sourceColumn: comparacao
+
+		annotation SummarizationSetBy = Automatic
+
 	partition dim_produto = m
 		mode: import
 		source =
 				let
 				    Fonte = Odbc.Query("driver={DuckDB Driver};database=" & CaminhoBanco & ";access_mode=read_only",
 				        "SELECT * FROM gold.dim_produto"),
-				    Tipos = Table.TransformColumnTypes(Fonte, {{"codigo_produto", type text}, {"titulo_produto", type text}, {"categoria", type text}, {"plataforma", type text}, {"url_produto", type text}, {"url_imagem", type text}, {"ultima_extracao", type date}})
+				    Tipos = Table.TransformColumnTypes(Fonte, {{"codigo_produto", type text}, {"titulo_produto", type text}, {"categoria", type text}, {"plataforma", type text}, {"url_produto", type text}, {"url_imagem", type text}, {"ultima_extracao", type date}, {"qtd_extracoes", Int64.Type}, {"comparacao", type text}})
 				in
 				    Tipos
 
 	annotation PBI_ResultType = Table
+
