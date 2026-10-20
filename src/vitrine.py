@@ -56,12 +56,18 @@ def baixar_imagens(con: duckdb.DuckDBPyConnection) -> int:
             baixado_em     TIMESTAMPTZ
         )
     """)
+    # compara com a URL MAIS RECENTE de cada produto (a foto pode mudar entre extrações)
     pendentes = con.execute("""
-        SELECT DISTINCT ON (p.codigo_produto) p.codigo_produto, p.url_imagem
-        FROM silver.produtos p
+        WITH atual AS (
+            SELECT DISTINCT ON (codigo_produto) codigo_produto, url_imagem
+            FROM silver.produtos
+            WHERE url_imagem IS NOT NULL
+            ORDER BY codigo_produto, data_extracao DESC
+        )
+        SELECT a.codigo_produto, a.url_imagem
+        FROM atual a
         LEFT JOIN silver.imagens i USING (codigo_produto)
-        WHERE p.url_imagem IS NOT NULL AND (i.codigo_produto IS NULL OR i.url_imagem <> p.url_imagem)
-        ORDER BY p.codigo_produto, p.data_extracao DESC
+        WHERE i.codigo_produto IS NULL OR i.url_imagem <> a.url_imagem
     """).fetchall()
 
     baixadas = 0
