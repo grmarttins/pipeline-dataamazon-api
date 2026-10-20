@@ -1,4 +1,3 @@
--- Resumo por categoria, dia e faixa de preço
 CREATE OR REPLACE TABLE gold.resumo_por_faixa AS
 SELECT
     categoria,

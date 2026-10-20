@@ -1,5 +1,3 @@
--- Dimensão de produto: atributos mais recentes de cada produto (1 linha por codigo_produto)
--- + em quantas extrações ele apareceu (para filtrar quem tem histórico para comparar)
 CREATE OR REPLACE TABLE gold.dim_produto AS
 SELECT
     codigo_produto,

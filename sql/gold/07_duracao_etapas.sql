@@ -1,4 +1,3 @@
--- Duração de cada etapa por execução do pipeline (base: ops.execucoes)
 CREATE OR REPLACE VIEW gold.duracao_etapas AS
 SELECT
     run_id,

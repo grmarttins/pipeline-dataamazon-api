@@ -1,13 +1,7 @@
 """
-DAGs do pipeline Amazon BR: API -> raw -> bronze -> silver -> DuckDB (gold + vitrine).
-
-- pipeline_amazon_diario: agendado todo dia às 9h (Brasília), mas criado PAUSADO. O plano
-  free da API tem cota baixa, então o agendamento fica declarado e é disparado manualmente.
-- pipeline_amazon_reprocessar: manual, não chama a API; refaz silver e banco a partir da bronze.
-
-Cada task reaproveita as funções de src/ e registra a etapa em ops.execucoes com o run_id do Airflow.
-Todas escrevem no DuckDB, que aceita um único processo escrevendo por vez: por isso usam o pool
-"duckdb" (1 vaga). O mapeamento por categoria continua declarado; o pool só serializa o acesso ao banco.
+Todas as tasks escrevem no DuckDB (ao menos em ops.execucoes), que aceita um único processo
+escrevendo por vez. O pool "duckdb" (1 vaga) serializa esse acesso; o mapeamento por
+categoria continua declarado.
 """
 import re
 from datetime import timedelta
@@ -23,7 +17,6 @@ PADRAO = {"owner": "dataeng", "retries": 1, "retry_delay": timedelta(minutes=5),
 
 
 def _run_id(context) -> str:
-    """run_id do Airflow (ex.: manual__2026-10-20T12:00:00+00:00) em formato seguro."""
     return re.sub(r"[^A-Za-z0-9T_-]", "", context["run_id"])[:60]
 
 
@@ -67,7 +60,6 @@ def transformar(particao: dict | None, **context) -> dict | None:
 
 @task
 def carregar(particoes: list[dict | None], **context) -> None:
-    """Carga no DuckDB + qualidade + imagens + gold + vitrine (cada uma registrada em ops.execucoes)."""
     from src.load import carregar as carregar_warehouse
 
     validas = [(p["categoria"], p["data"]) for p in particoes if p]
@@ -85,13 +77,12 @@ def listar_bronze() -> list[dict]:
     schedule="0 9 * * *",
     start_date=pendulum.datetime(2026, 10, 1, tz=FUSO),
     catchup=False,
-    is_paused_upon_creation=True,  # cota do plano free: agendamento declarado, disparo manual
+    is_paused_upon_creation=True,  # cota baixa no plano free da API: disparo manual
     max_active_runs=1,
     default_args=PADRAO,
     tags=["amazon", "medallion", "duckdb"],
 )
 def pipeline_amazon_diario():
-    # uma task de extração por categoria (dynamic task mapping)
     particoes = transformar.expand(particao=ingerir.expand(particao=extrair.expand(categoria=list(CATEGORIAS))))
     carregar(particoes)
 

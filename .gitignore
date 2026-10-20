@@ -16,3 +16,4 @@ data/
 # Power BI: cache e configurações locais
 **/.pbi/localSettings.json
 **/.pbi/cache.abf
+**/.pbi/editorSettings.json

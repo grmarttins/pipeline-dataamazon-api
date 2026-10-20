@@ -1,8 +1,6 @@
 """
-Vitrine de produtos para o Power BI: baixa miniaturas e gera uma "carta" SVG por produto.
-
-O Power BI não carrega imagens externas de dentro de um SVG, por isso a miniatura vai
-embutida em base64. A carta inteira vira um data URI exibido na matriz (dataCategory ImageUrl).
+Cartas SVG da vitrine do Power BI. O Power BI não carrega imagens externas dentro de um SVG,
+por isso a miniatura vai embutida em base64 e a carta inteira vira um data URI (ImageUrl).
 """
 import base64
 import io
@@ -32,7 +30,7 @@ def url_miniatura(url: str) -> str:
 
 
 def reduzir_imagem(conteudo: bytes, caixa: tuple[int, int] = (300, 250), qualidade: int = 72) -> bytes:
-    """Encaixa a imagem na caixa (2x a área exibida, para ficar nítida) e recomprime em JPEG."""
+    """Caixa com 2x a área exibida, para a imagem ficar nítida."""
     img = Image.open(io.BytesIO(conteudo))
     if img.mode != "RGB":  # PNG com transparência -> fundo branco
         fundo = Image.new("RGB", img.size, "white")
@@ -45,7 +43,6 @@ def reduzir_imagem(conteudo: bytes, caixa: tuple[int, int] = (300, 250), qualida
 
 
 def baixar_imagens(con: duckdb.DuckDBPyConnection) -> int:
-    """Baixa só as imagens que ainda não estão no banco (cache em silver.imagens)."""
     con.execute("""
         CREATE TABLE IF NOT EXISTS silver.imagens (
             codigo_produto VARCHAR PRIMARY KEY,
@@ -56,7 +53,8 @@ def baixar_imagens(con: duckdb.DuckDBPyConnection) -> int:
             baixado_em     TIMESTAMPTZ
         )
     """)
-    # compara com a URL MAIS RECENTE de cada produto (a foto pode mudar entre extrações)
+    # compara só com a URL mais recente: a foto muda entre extrações e, comparando com
+    # todas, os mesmos produtos seriam baixados de novo em toda execução
     pendentes = con.execute("""
         WITH atual AS (
             SELECT DISTINCT ON (codigo_produto) codigo_produto, url_imagem
@@ -112,7 +110,7 @@ def montar_card(p: dict, com_imagem: bool = True) -> str:
     t = 'font-family="Segoe UI, Calibri, sans-serif"'
     partes = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{LARGURA}" height="{ALTURA}" viewBox="0 0 {LARGURA} {ALTURA}">',
-        # fundo opaco na cor da página: o Power BI pode pintar de preto áreas transparentes da imagem
+        # fundo opaco: o Power BI pinta de preto as áreas transparentes da imagem
         f'<rect width="{LARGURA}" height="{ALTURA}" fill="rgb(250,250,252)"/>',
         f'<rect x="4" y="4" width="{LARGURA - 8}" height="{ALTURA - 8}" rx="12" fill="white" stroke="rgb(220,225,230)"/>',
     ]
@@ -150,13 +148,13 @@ def montar_card(p: dict, com_imagem: bool = True) -> str:
                       f'text-anchor="end">({qtd})</text>')
 
     partes.append("</svg>")
-    # SVG como texto (base64 incharia 33%). Escapa '%', '#', acentos e símbolos (★ …);
-    # sem isso, um "-74%" no selo quebrava a decodificação e cortava o resto da carta
+    # SVG como texto (base64 incharia 33%). Um '%' sem escape (ex.: selo "-74%") quebra a
+    # decodificação da URI e corta o resto da carta
     return "data:image/svg+xml;utf8," + quote("".join(partes), safe=SEGUROS_URI)
 
 
 def gerar_cards(con: duckdb.DuckDBPyConnection) -> int:
-    """Uma carta por produto e data (os preços mudam entre extrações), repetida em cada ordenação."""
+    """Uma carta por produto e data, reaproveitada nas três ordenações."""
     df = con.execute("SELECT * FROM gold.vitrine ORDER BY data, ordem_ordenacao, categoria, posicao").df()
     df = df.astype(object).where(df.notna(), None)
     cache, linhas = {}, []

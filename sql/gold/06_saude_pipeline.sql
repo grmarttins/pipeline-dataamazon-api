@@ -1,5 +1,4 @@
--- Saúde do pipeline por partição: frescor dos dados e latência entre camadas.
--- É VIEW (não tabela) para o frescor ser calculado no momento da consulta.
+-- VIEW (não tabela) para o frescor ser calculado no momento da consulta.
 CREATE OR REPLACE VIEW gold.saude_pipeline AS
 SELECT
     categoria_slug                                          AS categoria,

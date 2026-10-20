@@ -1,5 +1,4 @@
-# Airflow local para o pipeline (sobe com: docker compose up -d --build, dentro de orquestracao/)
-# UI em http://localhost:8081 — sem login (SIMPLE_AUTH_MANAGER_ALL_ADMINS), apenas para uso local.
+# Sem login (SIMPLE_AUTH_MANAGER_ALL_ADMINS): apenas para uso local.
 x-airflow-env: &airflow-env
   AIRFLOW__CORE__EXECUTOR: LocalExecutor
   AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
@@ -36,7 +35,6 @@ services:
     ports:
       - "8081:8080"
     volumes:
-      # o projeto inteiro (src/, sql/, config/.env e data/) fica visível para as DAGs
       - ..:/opt/airflow/projeto
     depends_on:
       postgres:

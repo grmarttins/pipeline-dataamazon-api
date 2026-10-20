@@ -1,4 +1,3 @@
--- Variação de preço de cada produto em relação à extração anterior
 CREATE OR REPLACE TABLE gold.historico_precos AS
 SELECT
     codigo_produto,

@@ -15,7 +15,7 @@ BRONZE_DIR = DATA_DIR / "bronze"
 SILVER_DIR = DATA_DIR / "silver"
 WAREHOUSE_PATH = DATA_DIR / "warehouse.duckdb"
 
-# slug (sem acento, usado nas pastas) -> (id da categoria na Amazon, nome de exibição)
+# slug usado nas pastas -> (id da categoria na Amazon, nome de exibição)
 CATEGORIAS = {
     "eletronicos": ("204547342011", "Eletrônicos"),
     # "informatica": ("16209062011", "Informática"),
@@ -32,7 +32,6 @@ def particao(camada_dir: Path, categoria: str, data: str) -> Path:
 
 
 def listar_particoes(camada_dir: Path) -> list[tuple[str, str]]:
-    """Retorna [(categoria, data), ...] de todas as partições existentes na camada."""
     particoes = []
     for pasta in sorted(camada_dir.glob("categoria=*/data_extracao=*")):
         categoria = pasta.parent.name.split("=", 1)[1]

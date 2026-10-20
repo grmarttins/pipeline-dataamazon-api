@@ -1,4 +1,3 @@
-"""raw -> bronze: achata os produtos em tabela, adiciona metadados de ingestão. Sem limpeza."""
 import json
 import logging
 from pathlib import Path
@@ -12,7 +11,6 @@ logger = logging.getLogger(__name__)
 
 
 def _para_texto(val) -> str | None:
-    """Bronze guarda tudo como texto; listas/dicts viram JSON."""
     if isinstance(val, (dict, list)):
         return json.dumps(val, ensure_ascii=False)
     if pd.isna(val):

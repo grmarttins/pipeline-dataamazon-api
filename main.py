@@ -1,10 +1,7 @@
 """
-Pipeline: API -> raw -> bronze -> silver -> DuckDB (silver.produtos + gold.*)
-Cada etapa é cronometrada e registrada em ops.execucoes, sob um run_id por execução.
-
-    python main.py                 # extrai hoje (todas as categorias) e processa
+    python main.py                 # extrai hoje e processa todas as camadas
     python main.py --pages 3       # extrai 3 páginas por categoria
-    python main.py --reprocessar   # não chama a API; refaz silver e banco a partir de toda a bronze
+    python main.py --reprocessar   # sem chamar a API: refaz silver e banco a partir da bronze
 """
 import argparse
 import logging

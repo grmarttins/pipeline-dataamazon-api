@@ -1,9 +1,6 @@
 """
-Migração única: os JSONs antigos (data/bronze/Eletrônicos_AAAA-MM-DD.json) já vinham
-enriquecidos, então entram direto como bronze na estrutura nova. Os originais e a silver
-antiga são movidos para data/_legado/ (nada é apagado).
-
-    python scripts/migrar_legado.py
+Migração única (já executada): os JSONs do formato antigo já vinham enriquecidos e entram
+direto como bronze. Originais e silver antiga vão para data/_legado/.
 """
 import json
 import re
@@ -35,7 +32,7 @@ def main():
         with open(arquivo, encoding="utf-8") as f:
             df = pd.DataFrame(json.load(f))
         df = df.drop(columns=["_categoria_nome"], errors="ignore")
-        # o legado gravava a hora da extração em horário local, sem fuso -> converte para UTC
+        # o legado gravava horário local sem fuso
         df["_extraido_em"] = (
             pd.to_datetime(df["_data_extracao"]).dt.tz_localize("America/Sao_Paulo").dt.tz_convert("UTC")
             .map(lambda t: t.isoformat())

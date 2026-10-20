@@ -1,17 +1,22 @@
 [project]
-name = "teste"
+name = "pipeline-dataamazon-api"
 version = "0.1.0"
-description = "Add your description here"
+description = "Pipeline de dados de produtos da Amazon BR: API, camadas medalhão, DuckDB, Airflow e Power BI"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.12"
 dependencies = [
-    "dotenv>=0.9.9",
     "duckdb>=1.5.6",
-    "matplotlib>=3.11.0",
     "pandas>=3.0.2",
     "pillow>=12.3.0",
     "pyarrow>=25.0.0",
+    "python-dotenv>=1.2.4",
     "requests>=2.33.1",
-    "seaborn>=0.13.2",
     "tenacity>=9.1.4",
+]
+
+[dependency-groups]
+notebook = [
+    "ipykernel>=7.4.0",
+    "matplotlib>=3.11.2",
+    "seaborn>=0.13.2",
 ]

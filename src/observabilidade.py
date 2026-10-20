@@ -1,4 +1,3 @@
-"""Tempos de execução e linhagem: run_id, timestamps em UTC e auditoria das etapas em ops.execucoes."""
 import logging
 import time
 import uuid
@@ -35,7 +34,7 @@ def agora_utc() -> datetime:
 
 
 def novo_run_id() -> str:
-    """Ex.: 20261020T210001Z-3f9a1c — ordenável por tempo e único."""
+    """Ex.: 20261020T210001Z-3f9a1c (ordenável por tempo e único)."""
     return f"{agora_utc():%Y%m%dT%H%M%SZ}-{uuid.uuid4().hex[:6]}"
 
 
@@ -56,12 +55,7 @@ def _registrar(linha: dict) -> None:
 
 @contextmanager
 def etapa(run_id: str, nome: str, categoria: str | None = None, data: str | None = None):
-    """
-    Mede e registra uma etapa do pipeline. Quem usa pode preencher info["registros"].
-
-        with etapa(run_id, "transform", "eletronicos", "2026-10-20") as info:
-            info["registros"] = ...
-    """
+    """Mede a etapa e grava em ops.execucoes, mesmo se falhar. Preencha info["registros"] no bloco."""
     info = {"registros": None}
     inicio, t0 = agora_utc(), time.perf_counter()
     status, erro = "ok", None

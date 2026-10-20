@@ -1,4 +1,3 @@
-"""bronze -> silver: tipagem, limpeza, schema fixo, um registro por produto."""
 import logging
 import re
 from pathlib import Path
@@ -13,7 +12,6 @@ logger = logging.getLogger(__name__)
 FAIXAS_BINS = [0, 50, 200, 500, 1500, float("inf")]
 FAIXAS_LABELS = ["Até R$50", "R$50-200", "R$200-500", "R$500-1500", "Acima de R$1500"]
 
-# coluna bronze -> coluna silver
 RENOMEAR = {
     "asin":                        "codigo_produto",
     "product_title":               "titulo_produto",
@@ -33,7 +31,7 @@ RENOMEAR = {
     "coupon_text":                 "cupom",
 }
 
-# schema fixo da silver: toda partição sai com exatamente estas colunas, nesta ordem
+# toda partição da silver sai com exatamente estas colunas, nesta ordem
 SCHEMA_SILVER = {
     "codigo_produto":         "string",
     "titulo_produto":         "string",
@@ -59,7 +57,7 @@ SCHEMA_SILVER = {
     "url_produto":            "string",
     "url_imagem":             "string",
     "data_extracao":          "datetime64[us]",
-    # linhagem (UTC): metadados, não entram na chave nem na deduplicação
+    # linhagem (UTC): metadados, fora da chave e da deduplicação
     "extraido_em":            "datetime64[us, UTC]",
     "ingerido_em":            "datetime64[us, UTC]",
     "processado_em":          "datetime64[us, UTC]",
@@ -104,7 +102,7 @@ def parse_entrega_gratis(val) -> bool:
 def transform(df: pd.DataFrame, run_id: str) -> pd.DataFrame:
     df = df.rename(columns=RENOMEAR)
 
-    # garante que colunas opcionais da API existam, mesmo vazias
+    # a API omite campos opcionais; garante que existam, mesmo vazios
     for col in list(RENOMEAR.values()) + ["sales_volume", "delivery", "book_format", "_extraido_em", "_ingerido_em"]:
         if col not in df.columns:
             df[col] = pd.NA

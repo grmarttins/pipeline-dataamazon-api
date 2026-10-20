@@ -1,6 +1,5 @@
--- Vitrine: cada produto em cada data de extração, posicionado em grade (5 cartas por linha)
--- para cada ordenação do Power BI. Cada (data, ordenação, categoria) tem a própria linha/coluna,
--- assim a grade nunca fica com buracos e o filtro de data troca a grade inteira.
+-- Posições de grade (5 por linha) pré-calculadas para cada (data, ordenação, categoria):
+-- a matriz do Power BI não fica com buracos ao trocar filtro ou ordenação.
 CREATE OR REPLACE TABLE gold.vitrine AS
 WITH ordenacoes(ordenacao, ordem_ordenacao) AS (
     VALUES ('Maior desconto', 1), ('Maior preço', 2), ('Menor preço', 3)

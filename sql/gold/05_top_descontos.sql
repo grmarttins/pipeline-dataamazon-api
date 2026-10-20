@@ -1,4 +1,3 @@
--- Top 20 maiores descontos de cada dia
 CREATE OR REPLACE TABLE gold.top_descontos AS
 SELECT
     f.data,

@@ -1,4 +1,3 @@
-"""silver (parquet) -> DuckDB: carga incremental por partição + gold em SQL + checagens de qualidade."""
 import logging
 
 import duckdb
@@ -29,19 +28,18 @@ def conectar() -> duckdb.DuckDBPyConnection:
     con = duckdb.connect(str(WAREHOUSE_PATH))
     con.execute("CREATE SCHEMA IF NOT EXISTS silver")
     con.execute("CREATE SCHEMA IF NOT EXISTS gold")
-    con.execute(DDL_EXECUCOES)  # as views de saúde do pipeline dependem dela
+    con.execute(DDL_EXECUCOES)  # as views gold de saúde do pipeline dependem dela
     return con
 
 
 def carregar_silver(con: duckdb.DuckDBPyConnection, categoria: str, data: str) -> None:
-    """Substitui a partição (categoria, data) no banco — reprocessar não duplica."""
+    """Substitui a partição inteira, para que reprocessar não duplique linhas."""
     arquivo = (particao(SILVER_DIR, categoria, data) / "produtos.parquet").as_posix()
     origem = f"SELECT *, ''::VARCHAR AS categoria_slug, now() AS carregado_em FROM read_parquet('{arquivo}')"
 
-    # na primeira carga, a tabela nasce com o schema do parquet + colunas de carga
     con.execute(f"CREATE TABLE IF NOT EXISTS silver.produtos AS {origem} LIMIT 0")
 
-    # evolução de schema: colunas novas na silver viram colunas novas na tabela (nulas no histórico)
+    # evolução de schema: colunas novas na silver viram colunas na tabela (nulas no histórico)
     existentes = {r[0] for r in con.execute("DESCRIBE silver.produtos").fetchall()}
     for nome, tipo, *_ in con.execute(f"DESCRIBE {origem}").fetchall():
         if nome not in existentes:

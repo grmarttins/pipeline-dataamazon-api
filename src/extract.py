@@ -1,4 +1,3 @@
-"""API -> raw: grava a resposta da API exatamente como veio, um arquivo por página."""
 import json
 import logging
 import os
@@ -24,15 +23,14 @@ load_dotenv(ENV_PATH)
 BASE_URL = "https://real-time-amazon-data.p.rapidapi.com/products-by-category"
 
 
-# Exceções
 class APIKeyError(Exception):
-    """Chave da API ausente ou inválida"""
+    pass
 
 class APIRateLimitError(Exception):
-    """Limite de requisições excedido (429)"""
+    pass
 
 class APIResponseError(Exception):
-    """Erro de resposta da API"""
+    pass
 
 
 def acessar_chave_api() -> dict:
@@ -75,7 +73,6 @@ def _fazer_request(params: dict, timeout: int = 20) -> tuple[dict, requests.Resp
 
 
 def extrair_pagina(categoria: str, page: int, run_id: str) -> tuple[dict, dict]:
-    """Retorna (resposta crua da API, metadados da requisição)."""
     categoria_id, _ = CATEGORIAS[categoria]
     params = {
         "category_id": categoria_id,
@@ -103,7 +100,6 @@ def extrair_pagina(categoria: str, page: int, run_id: str) -> tuple[dict, dict]:
 
 
 def salvar_raw(resposta: dict, meta: dict, categoria: str, data: str, page: int) -> Path:
-    """Resposta da API intocada em page_N.json; metadados ao lado, em page_N.meta.json."""
     output = particao(RAW_DIR, categoria, data) / f"page_{page}.json"
     output.parent.mkdir(parents=True, exist_ok=True)
     with open(output, "w", encoding="utf-8") as f:
