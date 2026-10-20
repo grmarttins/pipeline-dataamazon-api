@@ -1,0 +1,196 @@
+table fato_preco_diario
+	lineageTag: 57566183-a90e-489a-98c9-509fdc6f79cb
+
+	measure 'Produtos Monitorados' = DISTINCTCOUNT(fato_preco_diario[codigo_produto])
+		formatString: #,0
+		lineageTag: d9d46dc8-1d2d-4ac1-a9da-3c293fcd1cf1
+
+	measure 'Preço Médio' = AVERAGE(fato_preco_diario[preco])
+		formatString: \R$ #,0.00
+		lineageTag: b64d7203-101e-44de-bf3f-f968a1bcc7ce
+
+	measure 'Desconto Médio' = AVERAGE(fato_preco_diario[desconto_pct])
+		formatString: 0.0%
+		lineageTag: 299c8233-0b51-472c-bf05-5ef0b5a84898
+
+	measure '% com Desconto' = DIVIDE(CALCULATE(COUNTROWS(fato_preco_diario), fato_preco_diario[tem_desconto] = TRUE()), COUNTROWS(fato_preco_diario))
+		formatString: 0.0%
+		lineageTag: d0f9bbb5-3219-4e28-a383-c616c489e154
+
+	measure 'Avaliação Média' = AVERAGE(fato_preco_diario[avaliacao_media])
+		formatString: 0.00
+		lineageTag: 1d5ab8a6-1bd4-480e-a5c9-d5558487d324
+
+	measure 'Vendas Estimadas' = SUM(fato_preco_diario[volume_vendas_estimado])
+		formatString: #,0
+		lineageTag: 0b42c27a-82ba-4443-938d-1e0109d330a0
+
+	column codigo_produto
+		dataType: string
+		lineageTag: 42c9c297-7342-4b3d-a573-6a8199ee8150
+		summarizeBy: none
+		sourceColumn: codigo_produto
+
+		annotation SummarizationSetBy = Automatic
+
+	column data
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: b4c37dd0-6d2c-40e0-a43b-2b0eaed7105f
+		summarizeBy: none
+		sourceColumn: data
+
+		annotation SummarizationSetBy = Automatic
+
+	column categoria
+		dataType: string
+		lineageTag: 17c060d2-7470-4745-a387-c5414eed28eb
+		summarizeBy: none
+		sourceColumn: categoria
+
+		annotation SummarizationSetBy = Automatic
+
+	column faixa_preco
+		dataType: string
+		lineageTag: d9bb71b2-822a-48ea-a84c-797682653be8
+		summarizeBy: none
+		sourceColumn: faixa_preco
+		sortByColumn: faixa_ordem
+
+		annotation SummarizationSetBy = Automatic
+
+	column preco
+		dataType: double
+		formatString: \R$ #,0.00
+		lineageTag: 45fb3b60-eb77-4c83-aa61-a1cc1c8ce3fb
+		summarizeBy: none
+		sourceColumn: preco
+
+		annotation SummarizationSetBy = Automatic
+
+	column preco_original
+		dataType: double
+		formatString: \R$ #,0.00
+		lineageTag: cd6f5764-b745-4383-a679-dda08116b49b
+		summarizeBy: none
+		sourceColumn: preco_original
+
+		annotation SummarizationSetBy = Automatic
+
+	column preco_minimo_oferta
+		dataType: double
+		formatString: \R$ #,0.00
+		lineageTag: 618f1335-1c4b-4a08-9acc-ff27cc36f6be
+		summarizeBy: none
+		sourceColumn: preco_minimo_oferta
+
+		annotation SummarizationSetBy = Automatic
+
+	column desconto_pct
+		dataType: double
+		formatString: 0.0%
+		lineageTag: 7f19d0d9-e338-4a99-8dc1-8a0a6da3abe8
+		summarizeBy: none
+		sourceColumn: desconto_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column tem_desconto
+		dataType: boolean
+		lineageTag: 0e079af2-81c0-4484-a883-12ab2cebd597
+		summarizeBy: none
+		sourceColumn: tem_desconto
+
+		annotation SummarizationSetBy = Automatic
+
+	column avaliacao_media
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 615ff645-cf0d-4288-b079-c88235d3ccff
+		summarizeBy: none
+		sourceColumn: avaliacao_media
+
+		annotation SummarizationSetBy = Automatic
+
+	column quantidade_avaliacoes
+		dataType: int64
+		formatString: #,0
+		lineageTag: 43768140-a47e-46ea-8e4f-bec2b1f263cd
+		summarizeBy: none
+		sourceColumn: quantidade_avaliacoes
+
+		annotation SummarizationSetBy = Automatic
+
+	column quantidade_ofertas
+		dataType: int64
+		formatString: #,0
+		lineageTag: 2930e124-22f5-420a-a0e0-33c5613912b0
+		summarizeBy: none
+		sourceColumn: quantidade_ofertas
+
+		annotation SummarizationSetBy = Automatic
+
+	column volume_vendas_estimado
+		dataType: int64
+		formatString: #,0
+		lineageTag: 41d6b56d-247f-421d-90b4-6b6311999d88
+		summarizeBy: none
+		sourceColumn: volume_vendas_estimado
+
+		annotation SummarizationSetBy = Automatic
+
+	column prime
+		dataType: boolean
+		lineageTag: f1383621-fd95-4e26-bacb-aa399b005baf
+		summarizeBy: none
+		sourceColumn: prime
+
+		annotation SummarizationSetBy = Automatic
+
+	column mais_vendido
+		dataType: boolean
+		lineageTag: d2298e4c-6f23-4f52-b20e-902e364dfd23
+		summarizeBy: none
+		sourceColumn: mais_vendido
+
+		annotation SummarizationSetBy = Automatic
+
+	column escolha_amazon
+		dataType: boolean
+		lineageTag: bafa8d61-0cb1-4472-8205-3c9e1fe88ac7
+		summarizeBy: none
+		sourceColumn: escolha_amazon
+
+		annotation SummarizationSetBy = Automatic
+
+	column entrega_gratis
+		dataType: boolean
+		lineageTag: 4643e464-9796-464a-8108-b52103277207
+		summarizeBy: none
+		sourceColumn: entrega_gratis
+
+		annotation SummarizationSetBy = Automatic
+
+	column faixa_ordem
+		dataType: int64
+		formatString: #,0
+		lineageTag: 6224d263-bec9-420a-93e4-dfef9cf85c62
+		summarizeBy: none
+		sourceColumn: faixa_ordem
+		isHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fato_preco_diario = m
+		mode: import
+		source =
+				let
+				    Fonte = Odbc.Query("driver={DuckDB Driver};database=" & CaminhoBanco & ";access_mode=read_only",
+				        "SELECT * FROM gold.fato_preco_diario"),
+				    Tipos = Table.TransformColumnTypes(Fonte, {{"codigo_produto", type text}, {"data", type date}, {"categoria", type text}, {"faixa_preco", type text}, {"preco", type number}, {"preco_original", type number}, {"preco_minimo_oferta", type number}, {"desconto_pct", type number}, {"tem_desconto", type logical}, {"avaliacao_media", type number}, {"quantidade_avaliacoes", Int64.Type}, {"quantidade_ofertas", Int64.Type}, {"volume_vendas_estimado", Int64.Type}, {"prime", type logical}, {"mais_vendido", type logical}, {"escolha_amazon", type logical}, {"entrega_gratis", type logical}}),
+				    DescontoFracao = Table.TransformColumns(Tipos, {{"desconto_pct", each _ / 100, type number}}),
+				    Resultado = Table.AddColumn(DescontoFracao, "faixa_ordem", each List.PositionOf({"Até R$50", "R$50-200", "R$200-500", "R$500-1500", "Acima de R$1500"}, [faixa_preco]), Int64.Type)
+				in
+				    Resultado
+
+	annotation PBI_ResultType = Table

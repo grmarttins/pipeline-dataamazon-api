@@ -1,0 +1,73 @@
+table dim_produto
+	lineageTag: 54fb5274-b9ab-43c4-ba0c-418e469b8459
+
+	column codigo_produto
+		dataType: string
+		lineageTag: 5deff3e8-e9f0-4e63-a923-2c216ee2a4e2
+		summarizeBy: none
+		sourceColumn: codigo_produto
+
+		annotation SummarizationSetBy = Automatic
+
+	column titulo_produto
+		dataType: string
+		lineageTag: 45415962-25dc-446c-bb44-8de9fb52475a
+		summarizeBy: none
+		sourceColumn: titulo_produto
+
+		annotation SummarizationSetBy = Automatic
+
+	column categoria
+		dataType: string
+		lineageTag: 40fbc0aa-1eb4-4bf6-8fcf-0a23696f5027
+		summarizeBy: none
+		sourceColumn: categoria
+
+		annotation SummarizationSetBy = Automatic
+
+	column plataforma
+		dataType: string
+		lineageTag: 0327788d-5dc1-44bd-bb0d-ed76b8d32f8e
+		summarizeBy: none
+		sourceColumn: plataforma
+
+		annotation SummarizationSetBy = Automatic
+
+	column url_produto
+		dataType: string
+		lineageTag: c29d8d36-f755-4111-91f9-28d6e256255f
+		summarizeBy: none
+		sourceColumn: url_produto
+		dataCategory: WebUrl
+
+		annotation SummarizationSetBy = Automatic
+
+	column url_imagem
+		dataType: string
+		lineageTag: 4d53448f-7c88-407c-8e78-2595a70313a8
+		summarizeBy: none
+		sourceColumn: url_imagem
+		dataCategory: ImageUrl
+
+		annotation SummarizationSetBy = Automatic
+
+	column ultima_extracao
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 85a1e0de-1a3f-460a-b99d-a7c74855dcdc
+		summarizeBy: none
+		sourceColumn: ultima_extracao
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_produto = m
+		mode: import
+		source =
+				let
+				    Fonte = Odbc.Query("driver={DuckDB Driver};database=" & CaminhoBanco & ";access_mode=read_only",
+				        "SELECT * FROM gold.dim_produto"),
+				    Tipos = Table.TransformColumnTypes(Fonte, {{"codigo_produto", type text}, {"titulo_produto", type text}, {"categoria", type text}, {"plataforma", type text}, {"url_produto", type text}, {"url_imagem", type text}, {"ultima_extracao", type date}})
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table

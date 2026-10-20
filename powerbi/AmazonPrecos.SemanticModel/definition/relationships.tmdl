@@ -1,0 +1,15 @@
+relationship b00186eb-1526-48c0-b734-bf71b4685292
+	fromColumn: fato_preco_diario.data
+	toColumn: dim_data.data
+
+relationship 82623793-e885-45b2-ae82-4539fc4b8945
+	fromColumn: fato_preco_diario.codigo_produto
+	toColumn: dim_produto.codigo_produto
+
+relationship 0d65061c-fdb9-44fe-9b0f-5716c0a984bd
+	fromColumn: top_descontos.data
+	toColumn: dim_data.data
+
+relationship 52c6dfef-cfa7-4d48-89b1-f700baeacb4e
+	fromColumn: top_descontos.codigo_produto
+	toColumn: dim_produto.codigo_produto

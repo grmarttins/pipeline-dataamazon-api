@@ -1,0 +1,5 @@
+expression CaminhoBanco = "C:\Users\Gusttavo\Documents\02-engenharia-de-dados\pipeline-dataamazon-api\data\warehouse.duckdb" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 60e81f2f-4e40-46ed-a4d5-12af979cf06f
+
+	annotation PBI_ResultType = Text
+

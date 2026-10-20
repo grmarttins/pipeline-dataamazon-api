@@ -1,0 +1,23 @@
+table dim_data
+	lineageTag: 1e0b65c4-2a54-4b3f-b309-8d9e921eab62
+
+	column data
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: f378e27d-7e9d-4985-a59e-86f4b0b59574
+		summarizeBy: none
+		sourceColumn: data
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_data = m
+		mode: import
+		source =
+				let
+				    Fonte = Odbc.Query("driver={DuckDB Driver};database=" & CaminhoBanco & ";access_mode=read_only",
+				        "SELECT DISTINCT data FROM gold.fato_preco_diario ORDER BY data"),
+				    Tipos = Table.TransformColumnTypes(Fonte, {{"data", type date}})
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table

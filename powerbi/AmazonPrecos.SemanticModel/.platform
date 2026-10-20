@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "AmazonPrecos"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "1b07b28c-572d-4ae5-bc2c-d4ebce0991e1"
+  }
+}

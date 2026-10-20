@@ -12,3 +12,7 @@ wheels/
 
 # Dados do pipeline (raw/bronze/silver/gold)
 data/
+
+# Power BI: cache e configurações locais
+**/.pbi/localSettings.json
+**/.pbi/cache.abf

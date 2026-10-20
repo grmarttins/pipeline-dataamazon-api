@@ -1,0 +1,93 @@
+table top_descontos
+	lineageTag: d7726082-40e6-46bc-b5f2-6c8bea6bf4b8
+
+	column data
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 3e8820f9-cf33-42f1-8d42-1097836b2176
+		summarizeBy: none
+		sourceColumn: data
+
+		annotation SummarizationSetBy = Automatic
+
+	column posicao
+		dataType: int64
+		formatString: #,0
+		lineageTag: 812eb996-b067-4ee6-8f1d-674b789b58fd
+		summarizeBy: none
+		sourceColumn: posicao
+
+		annotation SummarizationSetBy = Automatic
+
+	column codigo_produto
+		dataType: string
+		lineageTag: 880e3444-0567-43f9-941f-4f3d9eca260f
+		summarizeBy: none
+		sourceColumn: codigo_produto
+
+		annotation SummarizationSetBy = Automatic
+
+	column titulo_produto
+		dataType: string
+		lineageTag: 95d8ec4f-9b7f-4e6c-bd5b-0738ceb7b797
+		summarizeBy: none
+		sourceColumn: titulo_produto
+
+		annotation SummarizationSetBy = Automatic
+
+	column categoria
+		dataType: string
+		lineageTag: 759d3d79-65ca-4c4b-ab97-ed74ef6fcf9c
+		summarizeBy: none
+		sourceColumn: categoria
+
+		annotation SummarizationSetBy = Automatic
+
+	column preco
+		dataType: double
+		formatString: \R$ #,0.00
+		lineageTag: 1b6e5344-1eef-42ac-b430-ec29acb6ddcf
+		summarizeBy: none
+		sourceColumn: preco
+
+		annotation SummarizationSetBy = Automatic
+
+	column preco_original
+		dataType: double
+		formatString: \R$ #,0.00
+		lineageTag: cf5932c9-0428-4a9c-a3da-0fb37bdc06c8
+		summarizeBy: none
+		sourceColumn: preco_original
+
+		annotation SummarizationSetBy = Automatic
+
+	column desconto_pct
+		dataType: double
+		formatString: 0.0%
+		lineageTag: daab0750-58ff-4c38-ba7a-7eb97c942769
+		summarizeBy: none
+		sourceColumn: desconto_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column avaliacao_media
+		dataType: double
+		formatString: #,0.00
+		lineageTag: bf298bc0-e55d-4c0a-b235-6b6bee8a462c
+		summarizeBy: none
+		sourceColumn: avaliacao_media
+
+		annotation SummarizationSetBy = Automatic
+
+	partition top_descontos = m
+		mode: import
+		source =
+				let
+				    Fonte = Odbc.Query("driver={DuckDB Driver};database=" & CaminhoBanco & ";access_mode=read_only",
+				        "SELECT * FROM gold.top_descontos"),
+				    Tipos = Table.TransformColumnTypes(Fonte, {{"data", type date}, {"posicao", Int64.Type}, {"codigo_produto", type text}, {"titulo_produto", type text}, {"categoria", type text}, {"preco", type number}, {"preco_original", type number}, {"desconto_pct", type number}, {"avaliacao_media", type number}}),
+				    Resultado = Table.TransformColumns(Tipos, {{"desconto_pct", each _ / 100, type number}})
+				in
+				    Resultado
+
+	annotation PBI_ResultType = Table

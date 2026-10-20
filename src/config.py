@@ -13,7 +13,7 @@ DATA_DIR = PROJECT_ROOT / "data"
 RAW_DIR = DATA_DIR / "raw"
 BRONZE_DIR = DATA_DIR / "bronze"
 SILVER_DIR = DATA_DIR / "silver"
-GOLD_DIR = DATA_DIR / "gold"
+WAREHOUSE_PATH = DATA_DIR / "warehouse.duckdb"
 
 # slug (sem acento, usado nas pastas) -> (id da categoria na Amazon, nome de exibição)
 CATEGORIAS = {
